@@ -15,11 +15,7 @@
   "bugs": {
     "url": "https://github.com/vladigoal/doc-data-parser/issues"
   },
-<<<<<<< HEAD
-  "homepage": "https://github.com/vladigoal/bemto-extend",
-=======
   "homepage": "https://github.com/vladigoal/doc-data-parser",
->>>>>>> 8a50ae9fa93a4d2f9d885896f0b72ca9e4b568d2
   "dependencies": {
     "through2": "0.6.3"
   }
