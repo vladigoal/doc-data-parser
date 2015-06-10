@@ -38,7 +38,11 @@ module.exports = function() {
         if(i < chunks.length - 1){
             var block = chunks[i].split('\n')[chunks[i].split('\n').length - 1]
             var blockSpaces = block.split('+b')[0]
-            var blockName = block.split('.')[1]
+            if(block.split('.')[1].split('(').length > 1){
+              var blockName = block.split('.')[1].split('(')[0]
+            }else{
+              var blockName = block.split('.')[1]
+            }
             result += chunks[i] + '\n' + blockSpaces + mixin(blockName, blockSpaces);
         }else{
             result += chunks[i];
