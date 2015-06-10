@@ -79,24 +79,15 @@ module.exports = function() {
             var blockSpaces = parentTplData.split('block content')[0].split('\n')[parentTplData.split('block content')[0].split('\n').length - 1];
             
             var chunks = fileContents.split('\n');
-            // console.log('chunks=', chunks)
             
             fileContents = chunks[0]  + '\n';
             for (var i = 1; i < chunks.length; i++){
               fileContents += blockSpaces + chunks[i] + '\n'
             }
-            // console.log('fileContents=', fileContents)
 
-            // console.log('parentTplData=', parentTplData.replace('block content', fileContents))
             fileContents = parentTplData.replace('block content', fileContents)
             
             bemReplace(fileContents);
-            
-            // var fName = tpl.split('/')[tpl.split('/').length - 1];
-            // var fileOutPath = __dirname.split('node_modules')[0] + 'dev/layouts/' + fName + '.jade';
-            // fs.writeFile(fileOutPath, result, function (err) {
-            //   return callback(null, file);
-            // });
 
           });
         }
@@ -111,10 +102,6 @@ module.exports = function() {
           rFile(filesList, num  + 1);
         });
       }else{
-        // var _chunks = String(file.contents).split(/\n\n/g);
-        // _chunks = _chunks[1].split(/\n/g);
-        
-        // file.contents = new Buffer(jadeVars, 'utf-8');
         parseParentTpl()
         // return callback(null, file);
       }
