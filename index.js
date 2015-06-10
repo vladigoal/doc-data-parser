@@ -129,7 +129,8 @@ module.exports = function() {
         var fileVarsArr = String(file.contents).split(/\n\s{0,}\n/g)[0].split('//---')[1].split('\n');
         var fileVars = {};
         for (var i = 1; i < fileVarsArr.length; i++){
-          fileVars[fileVarsArr[i].split(':')[0].replace(/\s{0,}/g, '')] = fileVarsArr[i].split(':')[1].replace(/\s{0,}/g, '')
+          fileVars[fileVarsArr[i].split(':')[0].replace(/\s{0,}/g, '')] = fileVarsArr[i].split(':')[1].replace(/\s{0,}$/g, '').replace(/^\s{0,}/g, '')
+          // fileVarsArr[i].split(':')[1].replace(/\s{0,}/g, '')
         };
         jadeVars = '- file = ' + JSON.stringify(fileVars) + '\n';
         parentTplName = fileVarsArr[1].split(':')[1].replace(/\s{0,}/g, '');
