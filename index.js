@@ -25,6 +25,8 @@ module.exports = function() {
               blockSpaces + '    - data = {}\n' +
               blockSpaces + '    - redefines = []\n' +
               blockSpaces + '    - if (typeof data1 === "object") redefines.push(data1)\n' +
+              blockSpaces + '    - if (typeof data2 === "object") redefines.push(data2)\n' +
+              blockSpaces + '    - if (typeof data3 === "object") redefines.push(data3)\n' +
               // blockSpaces + '    - da = JSON.stringify(data1)\n' +
               // blockSpaces + '    p #{da}\n' +
               blockSpaces + '    - for (var i in redefines)\n' +
@@ -43,27 +45,30 @@ module.exports = function() {
     function bemReplace(fileContents){
       var chunks = fileContents.split(': +i');
       var result = '';
-      for (var i = 0; i < chunks.length; i++){
-        if(i < chunks.length - 1){
-            var block = chunks[i].split('\n')[chunks[i].split('\n').length - 1]
-            var blockSpaces = block.split('+b')[0]
-            if(block.split('.')[1].split('(').length > 1){
-              var blockName = block.split('.')[1].split('(')[0]
-            }else{
-              var blockName = block.split('.')[1]
-            }
-            result += chunks[i] + '\n' + blockSpaces + mixin(blockName, blockSpaces);
-        }else{
-            result += chunks[i];
+      if(chunks.length > 1){
+        result = '';
+        for (var i = 0; i < chunks.length; i++){
+          if(i < chunks.length - 1){
+              var block = chunks[i].split('\n')[chunks[i].split('\n').length - 1]
+              var blockSpaces = block.split('+b')[0]
+              if(block.split('.')[1].split('(').length > 1){
+                var blockName = block.split('.')[1].split('(')[0]
+              }else{
+                var blockName = block.split('.')[1]
+              }
+              result += chunks[i] + '\n' + blockSpaces + mixin(blockName, blockSpaces);
+          }else{
+              result += chunks[i];
+          }
         }
+        bemReplace(result);
+      }else{
+        result = fileContents;
+        // console.log('result=', result)
+        result = jadeVars + result;
+        file.contents = new Buffer(result);
+        return callback(null, file);
       }
-
-      // console.log('result=', result)
-      result = jadeVars + result;
-      file.contents = new Buffer(result);
-
-      return callback(null, file);
-
     }
 
     function parseParentTpl(){
