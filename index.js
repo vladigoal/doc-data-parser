@@ -14,6 +14,13 @@ module.exports = function() {
     }
 
     function mixin(blockName, blockSpaces){
+      var filePath = __dirname.split('node_modules')[0] + 'src/templates/blocks/' + blockName + '/' + blockName + '.jade';
+      var blockContent = '';
+      var chunks = fs.readFileSync(filePath, 'utf-8').split('\n');
+      for (var i = 0; i < chunks.length; i++){
+        blockContent += blockSpaces + '    ' + chunks[i] + '\n';
+      }
+
       return  '  mixin dinamicMixin(data1, data2, data3)\n' +
               blockSpaces + '    - data = {}\n' +
               blockSpaces + '    - redefines = []\n' +
@@ -26,7 +33,9 @@ module.exports = function() {
               blockSpaces + '          - data[k] = redefines[i][k]\n' +
               blockSpaces + '    - data._bemto_chain = bemto_chain.slice()\n' +
               blockSpaces + '    - blockName = bemto_chain[bemto_chain.length-1]\n' +
-              blockSpaces + '    include ../../templates/blocks/' + blockName + '/' + blockName + '.jade\n' +
+              blockContent +
+              // blockSpaces + '    include ../../templates/blocks/' + blockName + '/' + blockName + '.jade\n' +
+              // 
               blockSpaces + '  +dinamicMixin'
     }
 
