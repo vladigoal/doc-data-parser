@@ -8,7 +8,9 @@ module.exports = function() {
     var jadeVars = '';
     var dataDir = __dirname.split('node_modules')[0] + 'src/templates/data';
     var parentTplName = '';
-    
+    var modalsList = [];
+    var allModalsTpl = '';
+
     if (file.isNull()){
       return callback(null, file);
     }
@@ -64,9 +66,9 @@ module.exports = function() {
         bemReplace(result);
       }else{
         result = fileContents;
-        // console.log('result=', result)
-        result = jadeVars + result;
+        result = jadeVars + result + allModalsTpl;
         file.contents = new Buffer(result);
+        // console.log(modalsTpl())
         return callback(null, file);
       }
     }
@@ -87,27 +89,25 @@ module.exports = function() {
 
             fileContents = parentTplData.replace('block content', fileContents)
             
-            bemReplace(fileContents);
+            modalsTpl(fileContents);
 
           });
         }
       }
 
-    function rFile(filesList, num){ //read file data
+    function rFile(filesList, num){ //read Json file data
       if(num < filesList.length - 1){
         fs.readFile(dataDir + '/' + filesList[num], 'utf8', function (err, data) {
-          // if (err) throw err;
           data = data.replace(/\r?\n|\r/g, '');
           jadeVars += '- ' + filesList[num].split('.')[0] + ' = ' + data + '\n';
           rFile(filesList, num  + 1);
         });
       }else{
         parseParentTpl()
-        // return callback(null, file);
       }
     }
 
-    function rDir(err, filesList){ //read data dir
+    function rDir(err, filesList){ //read Json data dir
       rFile(filesList, 0)
     }
 
@@ -116,15 +116,62 @@ module.exports = function() {
         var fileVarsArr = String(file.contents).split(/\n\s{0,}\n/g)[0].split('//---')[1].split('\n');
         var fileVars = {};
         for (var i = 1; i < fileVarsArr.length; i++){
-          fileVars[fileVarsArr[i].split(':')[0].replace(/\s{0,}/g, '')] = fileVarsArr[i].split(':')[1].replace(/\s{0,}$/g, '').replace(/^\s{0,}/g, '')
-          // fileVarsArr[i].split(':')[1].replace(/\s{0,}/g, '')
+          if(fileVarsArr[i].split(':')[0].replace(/\s{0,}/g, '') == 'modals'){
+            modalsList = fileVarsArr[i].split(':')[1].replace(/\s{0,}$/g, '').replace(/^\s{0,}/g, '').split(',')
+          }else{
+            fileVars[fileVarsArr[i].split(':')[0].replace(/\s{0,}/g, '')] = fileVarsArr[i].split(':')[1].replace(/\s{0,}$/g, '').replace(/^\s{0,}/g, '')
+          }
         };
         jadeVars = '- file = ' + JSON.stringify(fileVars) + '\n';
         parentTplName = fileVarsArr[1].split(':')[1].replace(/\s{0,}/g, '');
       }
     }
 
-    function doReplace() {
+    function modalsTpl(fileContents){
+      var filePath = __dirname.split('node_modules')[0] + 'src/templates/blocks/modals/modals.jade';
+      var mixinsNameList = [];
+      var mixinsBodyList = [];
+      var mixinTpl = '';
+      var mixinTplSpaces = '';
+      fs.readFile(filePath, 'utf-8', function (err, data) {
+        mixinTpl = data.split('+modal')[0]
+        mixinTplSpaces = mixinTpl.split('block')[0].split('\n')[mixinTpl.split('block')[0].split('\n').length - 1];
+        
+        for (var i = 0; i < modalsList.length; i++){
+          modalsList[i] = modalsList[i].replace(/\s{0,}$/g, '').replace(/^\s{0,}/g, '')
+          var chunksModals = data.split('+modal("' +modalsList[i]+ '"');
+          if(chunksModals.length > 1){
+            mixinsNameList.push('+modal("' +modalsList[i]+ '"' + chunksModals[1].split('\n')[0])
+            mixinsBodyList.push(data.split(mixinsNameList[i])[1].split('+modal')[0])
+          }
+        };
+
+        var _mixinChunks = mixinTpl.split('\n');
+        mixinTpl = '';
+        for (var i = 0; i < _mixinChunks.length; i++){
+          mixinTpl += '    ' + _mixinChunks[i] + '\n';
+        }
+
+        for (var i = 0; i < mixinsBodyList.length; i++){
+            var _bodyChunks = mixinsBodyList[i].split('\n');
+            var _bodyTpl = '';
+            for (var j = 0; j < _bodyChunks.length; j++) {
+              _bodyTpl += mixinTplSpaces + _bodyChunks[j] + '\n';
+              // } 
+            }
+            _bodyTpl += '    ' + mixinsNameList[i] + '\n'
+            console.log('mixinsNameList[i]=', mixinsNameList[i])
+            allModalsTpl += mixinTpl.replace('block', _bodyTpl);
+            // console.log('allModalsTpl=', allModalsTpl)
+        };
+
+        bemReplace(fileContents);
+
+      });
+      
+    }
+
+    function doReplace(){
 
       if (file.isBuffer()) {
         setFileVars()
