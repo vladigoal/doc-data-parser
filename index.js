@@ -66,9 +66,14 @@ module.exports = function() {
         bemReplace(result);
       }else{
         result = fileContents;
-        result = jadeVars + result + allModalsTpl;
+        if(modalsList.length > 1){
+          result = result.replace('script(src="/doc.min.js")', allModalsTpl)
+          result = jadeVars + result + '    script(src="/doc.min.js")';
+        }else{
+          result = jadeVars + result;
+        }
+        
         file.contents = new Buffer(result);
-        // console.log(modalsTpl())
         return callback(null, file);
       }
     }
@@ -89,7 +94,11 @@ module.exports = function() {
 
             fileContents = parentTplData.replace('block content', fileContents)
             
-            modalsTpl(fileContents);
+            if(modalsList.length > 1){
+              modalsTpl(fileContents);
+            }else{
+              bemReplace(fileContents);
+            }
 
           });
         }
@@ -137,8 +146,10 @@ module.exports = function() {
         mixinTpl = data.split('+modal')[0]
         mixinTplSpaces = mixinTpl.split('block')[0].split('\n')[mixinTpl.split('block')[0].split('\n').length - 1];
         
+        allModalsTpl = '- modals = [';
         for (var i = 0; i < modalsList.length; i++){
           modalsList[i] = modalsList[i].replace(/\s{0,}$/g, '').replace(/^\s{0,}/g, '')
+          allModalsTpl += '"' +modalsList[i] +'", ';
           var chunksModals = data.split('+modal("' +modalsList[i]+ '"');
           if(chunksModals.length > 1){
             mixinsNameList.push('+modal("' +modalsList[i]+ '"' + chunksModals[1].split('\n')[0])
@@ -146,23 +157,23 @@ module.exports = function() {
           }
         };
 
+        allModalsTpl = allModalsTpl.substr(0, allModalsTpl.length - 2) + ']\n';
+        allModalsTpl += '    section.modals\n'
+        
         var _mixinChunks = mixinTpl.split('\n');
         mixinTpl = '';
         for (var i = 0; i < _mixinChunks.length; i++){
-          mixinTpl += '    ' + _mixinChunks[i] + '\n';
+          mixinTpl += '        ' + _mixinChunks[i] + '\n';
         }
 
         for (var i = 0; i < mixinsBodyList.length; i++){
             var _bodyChunks = mixinsBodyList[i].split('\n');
             var _bodyTpl = '';
             for (var j = 0; j < _bodyChunks.length; j++) {
-              _bodyTpl += mixinTplSpaces + _bodyChunks[j] + '\n';
-              // } 
+              _bodyTpl += mixinTplSpaces + '    ' + _bodyChunks[j] + '\n';
             }
-            _bodyTpl += '    ' + mixinsNameList[i] + '\n'
-            console.log('mixinsNameList[i]=', mixinsNameList[i])
+            _bodyTpl += '        ' + mixinsNameList[i] + '\n'
             allModalsTpl += mixinTpl.replace('block', _bodyTpl);
-            // console.log('allModalsTpl=', allModalsTpl)
         };
 
         bemReplace(fileContents);
