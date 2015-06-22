@@ -66,6 +66,7 @@ module.exports = function() {
         bemReplace(result);
       }else{
         result = fileContents;
+        
         if(modalsList.length > 1){
           result = result.replace('script(src="/doc.min.js")', allModalsTpl)
           result = jadeVars + result + '    script(src="/doc.min.js")';
@@ -133,6 +134,8 @@ module.exports = function() {
         };
         jadeVars = '- file = ' + JSON.stringify(fileVars) + '\n';
         parentTplName = fileVarsArr[1].split(':')[1].replace(/\s{0,}/g, '');
+      }else{
+        return callback(null, file);
       }
     }
 
@@ -183,7 +186,6 @@ module.exports = function() {
     }
 
     function doReplace(){
-
       if (file.isBuffer()) {
         setFileVars()
         return fs.readdir(dataDir, rDir)
