@@ -74,6 +74,7 @@ module.exports = function() {
           result = jadeVars + result;
         }
         
+        // console.log('BemtoLevel=', BemtoLevel)
         file.contents = new Buffer(result);
         return callback(null, file);
       }
@@ -126,13 +127,24 @@ module.exports = function() {
         var fileVarsArr = String(file.contents).split(/\n\s{0,}\n/g)[0].split('//---')[1].split('\n');
         var fileVars = {};
         for (var i = 1; i < fileVarsArr.length; i++){
-          if(fileVarsArr[i].split(':')[0].replace(/\s{0,}/g, '') == 'modals'){
-            modalsList = fileVarsArr[i].split(':')[1].replace(/\s{0,}$/g, '').replace(/^\s{0,}/g, '').split(',')
+          
+          if(fileVarsArr[i].split(':')[0].replace(/\s{0,}/g, '') == 'bemto_level'){
+            var BemtoLevel = fileVarsArr[i].split(':')[1].replace(/\s{0,}$/g, '').replace(/^\s{0,}/g, '')
           }else{
-            fileVars[fileVarsArr[i].split(':')[0].replace(/\s{0,}/g, '')] = fileVarsArr[i].split(':')[1].replace(/\s{0,}$/g, '').replace(/^\s{0,}/g, '')
+            if(fileVarsArr[i].split(':')[0].replace(/\s{0,}/g, '') == 'modals'){
+              modalsList = fileVarsArr[i].split(':')[1].replace(/\s{0,}$/g, '').replace(/^\s{0,}/g, '').split(',')
+            }else{
+              fileVars[fileVarsArr[i].split(':')[0].replace(/\s{0,}/g, '')] = fileVarsArr[i].split(':')[1].replace(/\s{0,}$/g, '').replace(/^\s{0,}/g, '')
+            }
           }
+
         };
         jadeVars = '- file = ' + JSON.stringify(fileVars) + '\n';
+        if(BemtoLevel == 2){
+          jadeVars += 'include ../../../../node_modules/bemto.jade/bemto\n';
+        }else{
+          jadeVars += 'include ../../../node_modules/bemto.jade/bemto\n';
+        }
         parentTplName = fileVarsArr[1].split(':')[1].replace(/\s{0,}/g, '');
       }else{
         return callback(null, file);
