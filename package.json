@@ -10,13 +10,7 @@
     "type": "git",
     "url": "https://github.com/vladigoal/doc-data-parser.git"
   },
-<<<<<<< HEAD
-  "author": {
-    "name": "Gorbyk Vlad"
-  },
-=======
   "author": "Gorbyk Vlad",
->>>>>>> 723e546ea995208deb63b9be4be64a094431ae5e
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/vladigoal/doc-data-parser/issues"
@@ -24,15 +18,5 @@
   "homepage": "https://github.com/vladigoal/doc-data-parser",
   "dependencies": {
     "through2": "0.6.3"
-<<<<<<< HEAD
-  },
-  "gitHead": "723e546ea995208deb63b9be4be64a094431ae5e",
-  "readme": "ERROR: No README data found!",
-  "_id": "doc-data-parser@1.0.0",
-  "_shasum": "70bf046b42aa733953551d975cfeb8689e24d445",
-  "_from": "../../../../../tmp/npm-87770-6e3547c1/git-cache-29e5895339b5/723e546ea995208deb63b9be4be64a094431ae5e",
-  "_resolved": "git://github.com/vladigoal/doc-data-parser#723e546ea995208deb63b9be4be64a094431ae5e"
-=======
   }
->>>>>>> 723e546ea995208deb63b9be4be64a094431ae5e
 }
